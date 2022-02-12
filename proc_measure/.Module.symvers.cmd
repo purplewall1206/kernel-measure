@@ -1,1 +1,0 @@
-cmd_/home/ppw/llvm/kernel-measure/proc_measure/Module.symvers := sed 's/ko$$/o/' /home/ppw/llvm/kernel-measure/proc_measure/modules.order | scripts/mod/modpost -m -a   -o /home/ppw/llvm/kernel-measure/proc_measure/Module.symvers -e -i Module.symvers   -T -
