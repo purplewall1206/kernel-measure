@@ -30,7 +30,7 @@ void test2()
     __asm__ volatile("mov %%rax, %%r10\n\t" \
                     :::);
     RDTSC_STOP();
-    printf("test2 cycles: %ld\ntest2 time: %f ns\n", CYCLES(), (double)CYCLES()/FREQ);
+    printf("test2 cycles: %ld\ntest2 time: %.2f ns\n", CYCLES(), (double)CYCLES()/FREQ);
 }
 
 int main()
