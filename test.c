@@ -42,44 +42,42 @@ void test3()
     printf("test3 cycles: %ld\n", CYCLES());
 }
 
-void test4()
-{
-    char text[] = "test4\n";
-    register unsigned long rax __asm__ ("rax") = 1;
-    register int rdi __asm__ ("rdi") = 1; // console 
-    register const void *rsi __asm__ ("rsi") = text;
-    register size_t rdx __asm__ ("rdx") = strlen(text);
-    RDTSC_START();
-    // __asm__ volatile("int $0xff\n\t":::);
-    // write(1, "test", 4);
-    __asm__ volatile(
-        "syscall"
-        : "+r"(rax)
-        : "r"(rdi), "r"(rsi), "r"(rdx)
-        : "rcx", "r11", "memory"
-    );
-    RDTSC_STOP();
-    printf("test4 cycles: %ld\n", CYCLES());
-}
+// void test4()
+// {
+//     char text[] = "test4\n";
+    
+//     RDTSC_START();
+//     ssize_t ret;
+//     asm volatile
+//     (
+//         "int $0x80"
+//         : "=a"(ret)
+//         //        EDI      RSI       RDX
+//         : "0"(1), "b"(fd), "c"(buf), "d"(size)
+//         : "memory"
+//     );
+//     RDTSC_STOP();
+//     printf("test4 cycles: %ld\n", CYCLES());
+// }
 
 void test5()
 {
     char text[] = "test5\n";
-    register unsigned long rax __asm__ ("rax") = 1;
-    register int rdi __asm__ ("rdi") = 1; // console 
-    register const void *rsi __asm__ ("rsi") = text;
-    register size_t rdx __asm__ ("rdx") = strlen(text);
+
     RDTSC_START();
-    // __asm__ volatile("int $0xff\n\t":::);
-    // write(1, "test", 4);
-    __asm__ volatile(
-        "int $0x80 \n\t"
-        : "+r"(rax)
-        : "r"(rdi), "r"(rsi), "r"(rdx)
+    ssize_t ret;
+    asm volatile
+    (
+        "syscall"
+        : "=a"(ret)
+        //        EDI      RSI       RDX
+        : "0"(1), "D"(1), "S"(text), "d"(strlen(text))
         : "rcx", "r11", "memory"
     );
     RDTSC_STOP();
     printf("test5 cycles: %ld\n", CYCLES());
+
+    // write(1, "test\n", 5);
 }
 
 int main()
@@ -94,9 +92,9 @@ int main()
     //     test2();
     // } 
     // test3();
-    for (int i = 0;i < 5;i++) {
-        test4();
-    }
+    // for (int i = 0;i < 5;i++) {
+    //     test4();
+    // }
 
     for (int i = 0;i < 5;i++) {
         test5();
@@ -104,3 +102,8 @@ int main()
     // test4();
     return 0;
 }
+
+
+搞清楚int 0x80和syscall的区别
+
+增加procfs entry和注册irq
