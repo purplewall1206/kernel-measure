@@ -44,4 +44,19 @@ Contributions
 -------------
 'Humanized' comparison:  https://gist.github.com/hellerbarde/2843375
 Visual comparison chart: http://i.imgur.com/k0t1e.png
-```S
+```
+
+
+# 本次实验的坑
+
+1. ubuntu21.10 里面装4.19.229内核的问题
+
+initramfs failed to compress， junk files archive
+
+主要原因是kernel4.x 不支持zstd压缩，但是ubuntu用zstd压缩了initramfs。
+
+解决办法是在`/etc/initramfs-tools/update-initramfs.conf`里面把压缩算法改成支持的，比如gzip
+
+2. 小窍门 `LOCALVERSION=-custom`
+
+`make CC=clang -j8 LOCALVERSION=-custom` 之后能够在kernel中显示自己命名的kernel version，比较好。
