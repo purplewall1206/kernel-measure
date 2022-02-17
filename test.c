@@ -386,6 +386,8 @@ void test11()
     for (int i = 0;i < 10;i++) {
         printf("%ld  ", records[i]);
     }
+
+    // 46306  3356  2712  2620  2598  2574  2604  2610  2622  2630 
 }
 
 int main()
