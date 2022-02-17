@@ -314,6 +314,7 @@ void test8()
         }
         printf("%ld  ", records[i]);
     }
+    __rdtsc();
 
     // for (int i = 0;i < 1000000;i++) {
     //     if (i % 20 == 0) {
