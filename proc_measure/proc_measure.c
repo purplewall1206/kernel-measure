@@ -20,38 +20,37 @@ MODULE_AUTHOR("ppw");
 
 // 多次处理取平均和波动
 
-#define MODULE_NAME "proc_measure"
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/proc_fs.h>
+#include <linux/init.h>
+#include <linux/sched.h>
+#include <asm/uaccess.h>
+#include <linux/uaccess.h>
+#include <linux/slab.h>
+#include <linux/gfp.h>
+char *msg;
 
-int proc_measure_show(struct seq_file *seq, void *offset ) 
+int proc_init(void)
 {
-    char *msg = "this is test\n";
-    // count = strlen(msg);
-    seq_printf(seq, msg);
+    // create_new_proc_entry();
+    pr_info("%s before create\n", __func__);
+    msg = (char*)kmalloc(10 * sizeof(char), GFP_KERNEL);
+    memcpy(msg, "abc", 3);
+    char x;
+    pr_info("after create %016lx %016lx\n", msg, &x);
     return 0;
 }
 
-static int proc_measure_open(struct inode *inode, struct file *file)
+void proc_cleanup(void)
 {
-	return single_open(file, proc_measure_show, NULL);
+    
+    pr_info("%s  %s\n", __func__, msg);
+    kfree(msg);
+    // remove_proc_entry(dirname, &proc_fops);
+    // proc_remove(parent);
 }
 
-const struct proc_ops proc_fops = {
-    .proc_open		= proc_measure_open,
-	.proc_read		= seq_read,
-};
-
-static int __init proc_measure_init(void)
-{
-    pr_info("proc_measure simulate loaded at %p\n", MODULE_NAME, proc_measure_init);
-    proc_create("proc_measure", 0, NULL, &proc_fops);
-    return 0;
-}
-
-void __exit proc_measure_exit(void)
-{
-    pr_info("proc_measure simulate unload at %p\n", MODULE_NAME, proc_measure_exit);
-    remove_proc_entry("proc_measure", NULL);
-}
-
-module_init(proc_measure_init);
-module_exit(proc_measure_exit);
+// MODULE_LICENSE("GPL");
+module_init(proc_init);
+module_exit(proc_cleanup);
