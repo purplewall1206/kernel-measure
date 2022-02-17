@@ -32,15 +32,41 @@
 char *dirname = "measure";
 struct proc_dir_entry *parent;
 
+// ================ common =====================
+void testcr0(void)
+{
+    unsigned long cr0 = read_cr0();
+    pr_info("cr0: %016lx\n",cr0);
+}
+
 ssize_t read_proc(struct file *filp, char *buf, size_t count, loff_t *offp)
 {
     pr_info("%s\n", __func__);
+    testcr0();
     return 0;
 }
 
 struct file_operations proc_fops = {
     read : read_proc
 };
+
+// ================ CR0 =====================
+
+// void testcr0(void)
+// {
+//     unsigned long cr0 = read_cr0();
+//     pr_info("cr0: %016lx\n",cr0);
+// }
+
+
+// ================ CR3 =====================
+
+
+
+
+// ================ CR4 =====================
+
+
 
 void create_proc_entry(void)
 {
