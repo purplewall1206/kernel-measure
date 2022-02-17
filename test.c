@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <string.h>
+#include <x86intrin.h>
 
 #include "measure.h"
 
@@ -352,6 +353,26 @@ void test9()
     print(records, 1000000);
 }
 
+void test10()
+{
+    unsigned long records[1000000];
+    int index = 0;
+    unsigned long average = 0;
+    unsigned long data[10];
+    data[0] = 1;
+    _mm_clflush(data);
+    for (int i = 0;i < 10;i++) {
+        RDTSC_START();
+        data[0] = 1;
+        RDTSC_STOP();
+        records[index++] = CYCLES();
+    }
+    for (int i = 0;i < 10;i++) {
+        printf("%ld  ", records[i]);
+    }
+    printf("\n");
+}
+
 int main()
 {
     // for (int i = 0;i < 5;i++) {
@@ -379,7 +400,8 @@ int main()
 
     // test8();
 
-    test9();
+    // test9();
+    test10();
     return 0;
 }
 
