@@ -373,6 +373,21 @@ void test10()
     printf("\n");
 }
 
+void test11()
+{
+    unsigned long records[100];
+    int index = 0;
+    for (int i = 0;i < 10;i++) {
+        RDTSC_START();
+        long res = syscall(335);
+        RDTSC_STOP();
+        records[index++] = CYCLES();
+    }
+    for (int i = 0;i < 10;i++) {
+        printf("%ld  ", records[i]);
+    }
+}
+
 int main()
 {
     // for (int i = 0;i < 5;i++) {
@@ -402,6 +417,7 @@ int main()
 
     // test9();
     test10();
+    test11();
     return 0;
 }
 

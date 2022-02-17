@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/src/linux-headers-5.13.0-28-generic/include/**"
+                "/home/ppw/Documents/linux-4.19.229/include/**",
+                "/home/ppw/Documents/linux-4.19.229/arch/x86/include/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

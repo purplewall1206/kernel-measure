@@ -6,7 +6,7 @@
     unsigned int end_hi = 0, end_lo = 0;
 
 #define CYCLES() \
-    get_cycles(start_hi, start_lo, end_hi, end_lo)
+    get_cycles_measure(start_hi, start_lo, end_hi, end_lo)
 
 // Use the preprocessor so we know definitively that these are placed inline
 #define RDTSC_START()            \
@@ -26,7 +26,7 @@
 	                 :: "%rax", "%rbx", "%rcx", "%rdx");
 
 // Returns the elapsed time given the high and low bits of the start and stop time.
-unsigned long get_cycles(unsigned int start_hi, unsigned int start_lo,
+unsigned long get_cycles_measure(unsigned int start_hi, unsigned int start_lo,
                  unsigned int end_hi,   unsigned int end_lo)
 {
 	unsigned long start = (((unsigned long)start_hi) << 32) | start_lo;
