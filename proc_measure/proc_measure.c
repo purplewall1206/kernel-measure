@@ -9,6 +9,9 @@
 #include "../measure.h"
 #include <linux/version.h>
 #include <linux/uaccess.h>
+#include <linux/interrupt.h>
+
+#define IRQ_NO 11
 
 // #if LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,16)
 // ...
@@ -36,7 +39,7 @@ struct proc_dir_entry *parent;
 void testcr0(void)
 {
     unsigned long cr0 = read_cr0();
-    pr_info("cr0: %016lx\n",cr0);
+    pr_info("cr0: %016lx\n", cr0);
 }
 
 ssize_t read_proc(struct file *filp, char *buf, size_t count, loff_t *offp)
@@ -58,13 +61,27 @@ struct file_operations proc_fops = {
 //     pr_info("cr0: %016lx\n",cr0);
 // }
 
-
 // ================ CR3 =====================
 
-
-
-
 // ================ CR4 =====================
+
+// ================ IRQ =====================
+
+static irqreturn_t irq_handler(int irq, void *dev_id)
+{
+    printk(KERN_INFO "Shared IRQ: Interrupt Occurred\n");
+    return IRQ_HANDLED;
+}
+
+void create_irq(void)
+{
+    int ret;
+    
+    ret = request_irq(IRQ_NO, irq_handler, IRQF_SHARED, "TESTIRQ", (void *)irq_handler);
+    if (ret < 0) {
+        pr_err("create IRQ failed %d\n", ret);
+    }
+}
 
 
 
@@ -73,8 +90,6 @@ void create_proc_entry(void)
     parent = proc_mkdir(dirname, parent);
     proc_create("hello", 0666, parent, &proc_fops);
 }
-
-
 
 int proc_measure_init(void)
 {
@@ -86,7 +101,8 @@ int proc_measure_init(void)
 
 void proc_measure_exit(void)
 {
-    proc_remove(parent);   
+    proc_remove(parent);
+    free_irq(IRQ_NO, (void *) irq_handler);
     pr_info("%s exit\n", __func__);
     // proc_remove(parent);
 }
