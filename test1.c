@@ -11,7 +11,7 @@ int main()
     __asm__ volatile("movq  %0, %%rax \n\t" \
                     "movq  %%rax, %1 \n\t" \
                     : "=r"(b) \
-                    : "r"(a) \
+                    : "b"(a) \
                     : 
     );
 

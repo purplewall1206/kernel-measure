@@ -123,6 +123,8 @@ void test6()
     unsigned long records[100];
     int index = 0;
     unsigned long load = 0;
+
+    printf("########### test #PF and cache miss ###############\n\n");
     
     // if there is PF
     for (int i = 0;i < 10;i++) {
@@ -501,17 +503,17 @@ int main()
     // }
     // // test4();
 
-    // test6();
+    test6();
 
     // test7();
 
-    // test8();
+    test8();
 
     // test9();
-    // test10();
-    // test11();
-    // test12();
-    test13();
+    test10();
+    test11();
+    test12();
+    // test13();
     return 0;
 }
 

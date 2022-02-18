@@ -37,10 +37,12 @@ struct proc_dir_entry *parent;
 
 LANTENCY();
 
+// ================ CR0 =====================
 void testcr0(void)
 {
     unsigned long cr0;
-    unsigned long records[10];
+    unsigned long cr0_no_wp;
+    unsigned long records[20];
     int index;
     int i;
 
@@ -59,10 +61,32 @@ void testcr0(void)
     for (i = 0;i < 10;i++) {
         printk("%ld  ", records[i]);
     }
+    pr_info("\n###### testcr0 close wp ######\n");
+    cr0_no_wp = cr0 ^ 0x10000;
+    for (i = 0;i < 10;i++) {
+        RDTSC_START();
+        __asm__ volatile("mov %0, %%cr0\n\t" \
+                        : \
+                        :"r"(cr0_no_wp) \
+                        :);
+        RDTSC_STOP();
+        __asm__ volatile("mov %0, %%cr0\n\t" \
+                        : \
+                        :"r"(cr0) \
+                        :);
+        records[index++] = CYCLES();
+    }
+
+    for (i = 10;i < 20;i++) {
+        printk("%ld  ", records[i]);
+    }
+
     pr_info("cr0: %016lx\n", cr0);
     printk("\n\n\n");
     
 }
+
+// ================ CR3 =====================
 
 void testcr3(void)
 {
@@ -75,9 +99,9 @@ void testcr3(void)
     cr3 = __read_cr3();
     for (i = 0;i < 10;i++) {
         RDTSC_START();
-        __asm__ volatile("mov %0, %%cr0\n\t" \
+        __asm__ volatile("mov %0, %%cr3\n\t" \
                         : \
-                        :"r"(cr3) \
+                        :"a"(cr3) \
                         :);
         RDTSC_STOP();
         records[index++] = CYCLES();
@@ -91,10 +115,15 @@ void testcr3(void)
     
 }
 
+
+// ================ CR4 =====================
+
 void testcr4(void)
 {
     unsigned long cr4;
-    unsigned long records[10];
+    unsigned long cr4_no_smep;
+    unsigned long cr4_no_smap;
+    unsigned long records[30];
     int index;
     int i;
 
@@ -102,15 +131,58 @@ void testcr4(void)
     cr4 = native_read_cr4();
     for (i = 0;i < 10;i++) {
         RDTSC_START();
-        __asm__ volatile("mov %0, %%cr0\n\t" \
+        __asm__ volatile("mov %0, %%rax      \n\t" \
+                        "mov %%rax, %%cr4    \n\t" \
                         : \
-                        :"r"(cr4) \
+                        :"a"(cr4) \
                         :);
         RDTSC_STOP();
         records[index++] = CYCLES();
     }
     pr_info("###### testcr4 ######\n");
     for (i = 0;i < 10;i++) {
+        printk("%ld  ", records[i]);
+    }
+
+    pr_info("\n###### testcr4 close smep ######\n");
+    cr4_no_smep = cr4 ^ 0x100000;
+    for (i = 0;i < 10;i++) {
+        RDTSC_START();
+        __asm__ volatile("mov %0, %%rax      \n\t" \
+                        "mov %%rax, %%cr4    \n\t" \
+                        : \
+                        :"a"(cr4_no_smep) \
+                        :);
+        RDTSC_STOP();
+        __asm__ volatile("mov %0, %%rax      \n\t" \
+                        "mov %%rax, %%cr4    \n\t" \
+                        : \
+                        :"a"(cr4) \
+                        :);
+        records[index++] = CYCLES();
+    }
+    for (i = 10;i < 20;i++) {
+        printk("%ld  ", records[i]);
+    }
+
+    pr_info("\n###### testcr4 close smap ######\n");
+    cr4_no_smap = cr4 ^ 0x200000;
+    for (i = 0;i < 10;i++) {
+        RDTSC_START();
+        __asm__ volatile("mov %0, %%rax      \n\t" \
+                        "mov %%rax, %%cr4    \n\t" \
+                        : \
+                        :"a"(cr4_no_smap) \
+                        :);
+        RDTSC_STOP();
+        __asm__ volatile("mov %0, %%rax      \n\t" \
+                        "mov %%rax, %%cr4    \n\t" \
+                        : \
+                        :"a"(cr4) \
+                        :);
+        records[index++] = CYCLES();
+    }
+    for (i = 20;i < 30;i++) {
         printk("%ld  ", records[i]);
     }
     pr_info("cr4: %016lx\n", cr4);
@@ -133,17 +205,9 @@ struct file_operations proc_fops = {
     read : read_proc
 };
 
-// ================ CR0 =====================
 
-// void testcr0(void)
-// {
-//     unsigned long cr0 = read_cr0();
-//     pr_info("cr0: %016lx\n",cr0);
-// }
 
-// ================ CR3 =====================
 
-// ================ CR4 =====================
 
 // ================ IRQ =====================
 
