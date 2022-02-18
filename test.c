@@ -269,6 +269,7 @@ void test8()
     unsigned long records[100];
     int index = 0;
     char *mem = (char*)malloc(sizeof(char) * 4096);
+    printf("############# test memset() ###########\n");
     for (int i = 0;i < 10;i++) {
         RDTSC_START();
         memset(mem, 'c', 1);
@@ -294,20 +295,20 @@ void test8()
         records[index++] = CYCLES();
     }
 
-    printf("%c\n", mem[1000]);
-    unsigned long average = 0;
-    unsigned long record1[1000000];
-    int index1 = 0;
-    for (int i = 0;i < 1000000;i++) {
-        RDTSC_START();
-        // memset(mem, 'c', 4096);
-        // mem[0] = 'c';
-        __asm__ volatile ("mov %%rax, %%rax\n\t":::);
-        RDTSC_STOP();
-        record1[index1++] = CYCLES();
-        average += CYCLES();
-    }
-    printf("average cycles: %ld/1000000 = %ld\n", average, average/1000000);
+    // printf("%c\n", mem[1000]);
+    // unsigned long average = 0;
+    // unsigned long record1[1000000];
+    // int index1 = 0;
+    // for (int i = 0;i < 1000000;i++) {
+    //     RDTSC_START();
+    //     // memset(mem, 'c', 4096);
+    //     // mem[0] = 'c';
+    //     __asm__ volatile ("mov %%rax, %%rax\n\t":::);
+    //     RDTSC_STOP();
+    //     record1[index1++] = CYCLES();
+    //     average += CYCLES();
+    // }
+    // printf("average cycles: %ld/1000000 = %ld\n", average, average/1000000);
 
     for (int i = 0;i < 40;i++) {
         if (i % 10 == 0) {
@@ -360,6 +361,7 @@ void test10()
     unsigned long average = 0;
     unsigned long data[10];
     data[0] = 1;
+    printf("######## test cache miss ###########\n");
     _mm_clflush(data);
     for (int i = 0;i < 10;i++) {
         RDTSC_START();
@@ -370,24 +372,112 @@ void test10()
     for (int i = 0;i < 10;i++) {
         printf("%ld  ", records[i]);
     }
-    printf("\n");
+    printf("\n\n\n");
 }
 
 void test11()
 {
     unsigned long records[100];
     int index = 0;
+    printf("############## test syscall ############\n");
     for (int i = 0;i < 10;i++) {
         RDTSC_START();
-        long res = syscall(335);
+        long res = syscall(336);
         RDTSC_STOP();
         records[index++] = CYCLES();
     }
     for (int i = 0;i < 10;i++) {
         printf("%ld  ", records[i]);
     }
-
+    printf("\n\n\n");
     // 46306  3356  2712  2620  2598  2574  2604  2610  2622  2630 
+}
+
+void test12()
+{
+    unsigned long records[100];
+    int index = 0;
+    char *mem = (char*)malloc(sizeof(char) * 4096);
+    printf("############# test mem[i] = 'c' ##########\n");
+    for (int i = 0;i < 10;i++) {
+        RDTSC_START();
+        // memset(mem, 'c', 1);
+        mem[0] = 'c';
+        RDTSC_STOP();
+        records[index++] = CYCLES();
+    }
+    for (int i = 0;i < 10;i++) {
+        RDTSC_START();
+        // memset(mem, 'c', 100);
+        for (int c = 0; c < 100;c++) {
+            mem[c] = 'c';
+        }
+        RDTSC_STOP();
+        records[index++] = CYCLES();
+    }
+    for (int i = 0;i < 10;i++) {
+        RDTSC_START();
+        // memset(mem, 'c', 2000);
+        for (int c = 0; c < 2000;c++) {
+            mem[c] = 'c';
+        }
+        RDTSC_STOP();
+        records[index++] = CYCLES();
+    }
+    for (int i = 0;i < 10;i++) {
+        RDTSC_START();
+        // memset(mem, 'c', 4096);
+        for (int c = 0; c < 4096;c++) {
+            mem[c] = 'c';
+        }
+        RDTSC_STOP();
+        records[index++] = CYCLES();
+    }
+
+    for (int i = 0;i < 40;i++) {
+        if (i % 10 == 0) {
+            printf("\n\n");
+        }
+        printf("%ld  ", records[i]);
+    }
+    free(mem);
+    printf("\n\n\n");
+}
+
+void test13()
+{
+    unsigned long records[100];
+    int index = 0;
+
+    printf("############# int $0x80 ##########\n");
+    for (int i = 0;i < 10;i++) {
+        RDTSC_START();
+        asm("movq  $335, %%rax\n\t"  \
+            "int $0x80\n\t" \
+            :::);
+        // int x = 1 / 0;
+        RDTSC_STOP();
+        records[index++] = CYCLES();
+    }
+
+    // for (int i = 0;i < 10;i++) {
+    //     RDTSC_START();
+    //     asm("movq  $335, %%rax\n\t"  \
+    //         "syscall \n\t" \
+    //         :::);
+    //     // int x = 1 / 0;
+    //     RDTSC_STOP();
+    //     records[index++] = CYCLES();
+    // }
+
+    for (int i = 0;i < 20;i++) {
+        if (i % 10 == 0) {
+            printf("\n\n");
+        }
+        printf("%ld  ", records[i]);
+    }
+
+    printf("\n\n\n");
 }
 
 int main()
@@ -418,8 +508,10 @@ int main()
     // test8();
 
     // test9();
-    test10();
-    test11();
+    // test10();
+    // test11();
+    // test12();
+    test13();
     return 0;
 }
 
