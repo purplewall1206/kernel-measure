@@ -192,18 +192,18 @@ void testcr4(void)
 
 // ================ common =====================
 
-ssize_t read_proc(struct file *filp, char *buf, size_t count, loff_t *offp)
-{
-    pr_info("%s\n", __func__);
-    testcr0();
-    testcr3();
-    testcr4();
-    return 0;
-}
+// ssize_t read_proc(struct file *filp, char *buf, size_t count, loff_t *offp)
+// {
+//     pr_info("%s\n", __func__);
+//     testcr0();
+//     testcr3();
+//     testcr4();
+//     return 0;
+// }
 
-struct file_operations proc_fops = {
-    read : read_proc
-};
+// struct file_operations proc_fops = {
+//     read : read_proc
+// };
 
 
 
@@ -231,29 +231,33 @@ void create_irq(void)
 
 
 
-void create_proc_entry(void)
-{
-    parent = proc_mkdir(dirname, parent);
-    proc_create("hello", 0666, parent, &proc_fops);
-}
+// void create_proc_entry(void)
+// {
+//     parent = proc_mkdir(dirname, parent);
+//     proc_create("hello", 0666, parent, &proc_fops);
+// }
 
 int proc_measure_init(void)
 {
     // create_new_proc_entry();
     pr_info("%s init\n", __func__);
     create_irq();
-    create_proc_entry();
+    // create_proc_entry();
+
+        testcr0();
+    testcr3();
+    testcr4();
     return 0;
 }
 
 void proc_measure_exit(void)
 {
-    proc_remove(parent);
+    // proc_remove(parent);
     free_irq(IRQ_NO, (void *) irq_handler);
     pr_info("%s exit\n", __func__);
     // proc_remove(parent);
 }
 
-// MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL");
 module_init(proc_measure_init);
 module_exit(proc_measure_exit);
